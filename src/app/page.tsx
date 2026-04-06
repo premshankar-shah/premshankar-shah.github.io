@@ -383,9 +383,8 @@ export default function HomePage() {
                 My Journey
               </Link>
               <a
-                href="https://premshankar-shah.github.io/resume/"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/Premshankar_Shah_Resume.pdf"
+                download="Premshankar_Shah_Resume.pdf"
                 className="btn btn-ghost"
                 id="hero-cta-resume"
               >
