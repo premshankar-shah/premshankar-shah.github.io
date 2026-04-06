@@ -2,6 +2,14 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 
+// ── SVG Icons ──────────────────────────────────────────────────────────────
+const MailIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </svg>
+);
+
 // ── Expertise Pillars Data ─────────────────────────────────────────────────
 const pillars = [
   {
@@ -11,7 +19,6 @@ const pillars = [
     title: "Enterprise Architecture",
     body: "I design mobile systems with the 18-month roadmap in mind — not just the next sprint. At Searce, I architected an offline-first EPOS platform for 500+ retailers where a wrong schema decision would have meant weeks of migration pain for operators mid-shift.",
     metric: "500+ retailers · 99.9% reliability",
-    tag: "tag-purple",
   },
   {
     icon: "📱",
@@ -20,7 +27,6 @@ const pillars = [
     title: "Cross-Platform Mobile Systems",
     body: "Five production apps across Apple App Store, Google Play, and Adyen Store — each with platform-specific compliance and UX nuance. I treat iOS and Android as first-class citizens, not afterthoughts.",
     metric: "5+ apps shipped · 100% compliance",
-    tag: "tag-blue",
   },
   {
     icon: "⚡",
@@ -29,7 +35,6 @@ const pillars = [
     title: "Performance Engineering",
     body: "I don't just write fast code — I profile, measure, and systematically eliminate bottlenecks. Optimised apps up to 70% through memory profiling, modular refactoring, and intelligent lazy loading.",
     metric: "70% perf improvement · 20% crash reduction",
-    tag: "tag-green",
   },
   {
     icon: "💳",
@@ -38,7 +43,6 @@ const pillars = [
     title: "Payment & Hardware Integration",
     body: "Adyen SDK, Stripe, In-App Purchases — and the custom Kotlin/Swift native modules that bridge the gap to physical payment terminals. I understand that a failed payment is a failed business moment.",
     metric: "30% faster transactions · 25% reliability gain",
-    tag: "tag-orange",
   },
   {
     icon: "🔄",
@@ -47,7 +51,6 @@ const pillars = [
     title: "Offline-First & Sync Engines",
     body: "Connectivity is a privilege, not a guarantee. I built a WatermelonDB + custom sync engine that survived real-world scenarios: queued transactions, conflict resolution, and zero data loss in low-signal retail environments.",
     metric: "60% transaction success improvement",
-    tag: "tag-rose",
   },
   {
     icon: "🚀",
@@ -56,7 +59,6 @@ const pillars = [
     title: "CI/CD & DevOps Ownership",
     body: "I own the pipeline, not just the code. GitHub Actions + Fastlane reduced our deployment cycle by 50% and eliminated the 2am hotfix scramble. Zero-downtime releases became the baseline expectation.",
     metric: "50% faster deploys · 80%+ test coverage",
-    tag: "tag-purple",
   },
   {
     icon: "🧠",
@@ -65,7 +67,6 @@ const pillars = [
     title: "Technical Mentorship",
     body: "Senior engineering is about multiplying the team's output, not just your own. Mentored 3 junior engineers on architecture and TypeScript patterns, accelerating their productivity ramp-up by 40%.",
     metric: "3 engineers mentored · 40% ramp-up faster",
-    tag: "tag-blue",
   },
   {
     icon: "📦",
@@ -74,7 +75,46 @@ const pillars = [
     title: "Open Source Contributions",
     body: "Architected a React Native boilerplate saving 15+ hours of project setup time. Resolved 20+ issues across ecosystem libraries used by thousands of developers globally.",
     metric: "5+ repos · 15+ hours saved per project",
-    tag: "tag-green",
+  },
+];
+
+// ── Tech Stack Data ────────────────────────────────────────────────────────
+const techStack = [
+  {
+    label: "Mobile",
+    emoji: "📱",
+    accentClass: "tag-purple",
+    items: ["React Native", "Expo", "iOS (Xcode)", "Android Studio"],
+  },
+  {
+    label: "Languages",
+    emoji: "💻",
+    accentClass: "tag-blue",
+    items: ["TypeScript", "JavaScript (ES6+)", "Swift", "Kotlin"],
+  },
+  {
+    label: "State Management",
+    emoji: "🔀",
+    accentClass: "tag-green",
+    items: ["Redux Toolkit", "Zustand", "React Query", "Context API"],
+  },
+  {
+    label: "Databases",
+    emoji: "🗄️",
+    accentClass: "tag-orange",
+    items: ["WatermelonDB", "SQLite", "Firebase", "MongoDB", "Realm"],
+  },
+  {
+    label: "Payments",
+    emoji: "💳",
+    accentClass: "tag-rose",
+    items: ["Adyen SDK", "Stripe SDK", "In-App Purchases"],
+  },
+  {
+    label: "DevOps & CI/CD",
+    emoji: "🚀",
+    accentClass: "tag-blue",
+    items: ["GitHub Actions", "Fastlane", "Jest", "Postman"],
   },
 ];
 
@@ -140,10 +180,171 @@ function useReveal() {
   }, []);
 }
 
+// ── Draggable Marquee Component ────────────────────────────────────────────
+function DraggableMarquee() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const isHovered = useRef(false);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const startScrollLeft = useRef(0);
+  const posRef = useRef(0);
+
+  const pillarsDoubled = [...pillars, ...pillars];
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    let rafId: number;
+    const speed = 0.6; // px per frame
+
+    const animate = () => {
+      if (!isHovered.current && !isDragging.current) {
+        posRef.current += speed;
+        // Reset halfway through (content is doubled)
+        if (posRef.current >= track.scrollWidth / 2) {
+          posRef.current = 0;
+        }
+        track.scrollLeft = posRef.current;
+      } else {
+        // Keep posRef in sync while paused so resuming is seamless
+        posRef.current = track.scrollLeft;
+      }
+      rafId = requestAnimationFrame(animate);
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    const track = trackRef.current;
+    if (!track) return;
+    isDragging.current = true;
+    startX.current = e.pageX - track.getBoundingClientRect().left;
+    startScrollLeft.current = track.scrollLeft;
+    track.style.cursor = "grabbing";
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current) return;
+    const track = trackRef.current;
+    if (!track) return;
+    e.preventDefault();
+    const x = e.pageX - track.getBoundingClientRect().left;
+    const walk = (x - startX.current) * 1.5;
+    track.scrollLeft = startScrollLeft.current - walk;
+  };
+
+  const onMouseUp = () => {
+    isDragging.current = false;
+    if (trackRef.current) trackRef.current.style.cursor = "grab";
+  };
+
+  return (
+    <section className="marquee-section" id="expertise">
+      <p className="marquee-label">Expertise Pillars · Drag or hover to pause</p>
+
+      <div
+        className="marquee-track"
+        ref={trackRef}
+        onMouseEnter={() => { isHovered.current = true; }}
+        onMouseLeave={() => { isHovered.current = false; isDragging.current = false; if (trackRef.current) trackRef.current.style.cursor = "grab"; }}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+      >
+        <div className="marquee-inner">
+          {pillarsDoubled.map((p, i) => (
+            <div className="pillar-card" key={i} style={{ userSelect: "none" }}>
+              <div className="pillar-icon" style={{ background: p.iconBg, color: p.color }}>
+                {p.icon}
+              </div>
+              <div className="pillar-title">{p.title}</div>
+              <div className="pillar-body">{p.body}</div>
+              <div className="pillar-metric">{p.metric}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Tech Stack Section ─────────────────────────────────────────────────────
+function TechStackSection() {
+  return (
+    <section className="section" style={{ paddingTop: 0 }} id="tech-stack">
+      <div className="container">
+        <div className="glass-card reveal" style={{ padding: "2.5rem 2.5rem 2rem", borderRadius: "20px" }}>
+          {/* Header */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
+            <div>
+              <p className="section-eyebrow" style={{ marginBottom: "0.4rem" }}>Technical Skills</p>
+              <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                Tools & technologies I use in production
+              </p>
+            </div>
+            <span
+              className="tag tag-green"
+              style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "0.72rem" }}
+            >
+              ● 5+ yrs production
+            </span>
+          </div>
+
+          {/* Categories grid */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: "1.5rem",
+            }}
+          >
+            {techStack.map((cat) => (
+              <div key={cat.label}>
+                {/* Category label */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    marginBottom: "0.85rem",
+                  }}
+                >
+                  <span style={{ fontSize: "0.9rem" }}>{cat.emoji}</span>
+                  <span
+                    style={{
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.09em",
+                      textTransform: "uppercase",
+                      color: "var(--text-muted)",
+                    }}
+                  >
+                    {cat.label}
+                  </span>
+                </div>
+                {/* Tech pills */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
+                  {cat.items.map((item) => (
+                    <span key={item} className={`tag ${cat.accentClass}`} style={{ fontSize: "0.78rem" }}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── Home Page ──────────────────────────────────────────────────────────────
 export default function HomePage() {
   useReveal();
-  const pillarsDoubled = [...pillars, ...pillars]; // loop for infinite marquee
 
   return (
     <>
@@ -214,28 +415,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ════════════════════ EXPERTISE PILLARS MARQUEE ════════════════════ */}
-      <section className="marquee-section" id="expertise">
-        <p className="marquee-label">Expertise Pillars · Hover to pause</p>
-
-        <div className="marquee-track">
-          <div className="marquee-inner">
-            {pillarsDoubled.map((p, i) => (
-              <div className="pillar-card" key={i}>
-                <div
-                  className="pillar-icon"
-                  style={{ background: p.iconBg, color: p.color }}
-                >
-                  {p.icon}
-                </div>
-                <div className="pillar-title">{p.title}</div>
-                <div className="pillar-body">{p.body}</div>
-                <div className="pillar-metric">{p.metric}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ════════════════════ EXPERTISE PILLARS (drag-to-scroll) ════════════ */}
+      <DraggableMarquee />
 
       {/* ════════════════════ FEATURED WORK ════════════════════ */}
       <section className="section" id="featured-work">
@@ -257,16 +438,10 @@ export default function HomePage() {
                 <div className="project-card reveal glass-card" style={{ borderRadius: "20px" }}>
                   <div className="project-header">
                     <div className="project-meta">
-                      <span
-                        className="tag tag-purple"
-                        style={{ fontFamily: "JetBrains Mono, monospace" }}
-                      >
+                      <span className="tag tag-purple" style={{ fontFamily: "JetBrains Mono, monospace" }}>
                         Case Study 0{i + 1}
                       </span>
-                      <span
-                        className="read-more"
-                        style={{ marginLeft: "auto" }}
-                      >
+                      <span className="read-more" style={{ marginLeft: "auto" }}>
                         Read case study →
                       </span>
                     </div>
@@ -274,9 +449,7 @@ export default function HomePage() {
                     <p className="project-summary">{p.summary}</p>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
                       {p.tags.map((t, j) => (
-                        <span key={j} className={`tag ${p.tagColors[j]}`}>
-                          {t}
-                        </span>
+                        <span key={j} className={`tag ${p.tagColors[j]}`}>{t}</span>
                       ))}
                     </div>
                   </div>
@@ -293,10 +466,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div
-            style={{ marginTop: "3rem", display: "flex", justifyContent: "center" }}
-            className="reveal"
-          >
+          <div style={{ marginTop: "3rem", display: "flex", justifyContent: "center" }} className="reveal">
             <Link href="/work" className="btn btn-ghost" id="view-all-work">
               View All Projects →
             </Link>
@@ -304,67 +474,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ════════════════════ TECH STACK STRIP ════════════════════ */}
-      <section
-        className="section"
-        style={{ paddingTop: 0 }}
-        id="tech-stack"
-      >
-        <div className="container">
-          <div
-            className="glass-card reveal"
-            style={{ padding: "2.5rem", borderRadius: "20px" }}
-          >
-            <p
-              className="section-eyebrow"
-              style={{ marginBottom: "2rem" }}
-            >
-              Tech Stack
-            </p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "1.5rem",
-              }}
-            >
-              {[
-                { label: "Mobile", items: "React Native · Expo · iOS · Android" },
-                { label: "Languages", items: "TypeScript · JavaScript · Swift · Kotlin" },
-                { label: "State", items: "Redux Toolkit · Zustand · React Query" },
-                { label: "Databases", items: "WatermelonDB · SQLite · Firebase · MongoDB" },
-                { label: "Payments", items: "Adyen SDK · Stripe · IAP" },
-                { label: "DevOps", items: "GitHub Actions · Fastlane · Jest · Postman" },
-              ].map((s) => (
-                <div key={s.label}>
-                  <div
-                    style={{
-                      fontSize: "0.7rem",
-                      fontWeight: 700,
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      color: "var(--accent-secondary)",
-                      marginBottom: "0.4rem",
-                    }}
-                  >
-                    {s.label}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "0.82rem",
-                      color: "var(--text-secondary)",
-                      lineHeight: 1.7,
-                      fontFamily: "JetBrains Mono, monospace",
-                    }}
-                  >
-                    {s.items}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ════════════════════ TECH STACK ════════════════════ */}
+      <TechStackSection />
 
       {/* ════════════════════ CTA ════════════════════ */}
       <section className="cta-section" id="contact">
@@ -383,12 +494,8 @@ export default function HomePage() {
               lead a team, and ship apps that matter. 60-day notice period.
             </p>
             <div className="cta-links">
-              <a
-                href="mailto:shahprem2412@gmail.com"
-                className="btn btn-primary"
-                id="cta-email"
-              >
-                ✉ shahprem2412@gmail.com
+              <a href="mailto:shahprem2412@gmail.com" className="btn btn-primary" id="cta-email">
+                <MailIcon /> shahprem2412@gmail.com
               </a>
               <a
                 href="https://www.linkedin.com/in/premshankar-shah"
@@ -408,11 +515,7 @@ export default function HomePage() {
               >
                 ⌥ GitHub
               </a>
-              <a
-                href="tel:+919824594969"
-                className="social-chip"
-                id="cta-phone"
-              >
+              <a href="tel:+919824594969" className="social-chip" id="cta-phone">
                 ☎ +91 98245 94969
               </a>
             </div>

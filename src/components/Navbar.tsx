@@ -3,6 +3,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+const MailIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </svg>
+);
+
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/timeline", label: "Timeline" },
@@ -22,13 +29,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => setMobileOpen(false), [pathname]);
+  const closeMobile = () => setMobileOpen(false);
 
   return (
     <>
       <nav className="navbar" style={{ boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.3)" : "none" }}>
         <div className="container">
-          <Link href="/" className="nav-logo">
+          <Link href="/" className="nav-logo" onClick={closeMobile}>
             &lt;Prem /&gt;
           </Link>
 
@@ -45,16 +52,8 @@ export default function Navbar() {
             ))}
           </ul>
 
-          <Link
-            href="mailto:shahprem2412@gmail.com"
-            className="nav-cta"
-            style={{ display: "none" }}
-          />
-          <a
-            href="mailto:shahprem2412@gmail.com"
-            className="nav-cta"
-          >
-            <span>✉</span> Hire Me
+          <a href="mailto:shahprem2412@gmail.com" className="nav-cta" id="nav-hire-me">
+            <MailIcon /> Hire Me
           </a>
 
           <button
@@ -63,17 +62,9 @@ export default function Navbar() {
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle menu"
           >
-            <span
-              style={{
-                transform: mobileOpen ? "rotate(45deg) translate(5px, 5px)" : "none",
-              }}
-            />
+            <span style={{ transform: mobileOpen ? "rotate(45deg) translate(5px, 5px)" : "none" }} />
             <span style={{ opacity: mobileOpen ? 0 : 1 }} />
-            <span
-              style={{
-                transform: mobileOpen ? "rotate(-45deg) translate(5px, -5px)" : "none",
-              }}
-            />
+            <span style={{ transform: mobileOpen ? "rotate(-45deg) translate(5px, -5px)" : "none" }} />
           </button>
         </div>
       </nav>
@@ -86,6 +77,7 @@ export default function Navbar() {
             href={l.href}
             className={`nav-link ${pathname === l.href ? "active" : ""}`}
             style={{ fontSize: "1rem", padding: "0.5rem 0" }}
+            onClick={closeMobile}
           >
             {l.label}
           </Link>
@@ -93,9 +85,10 @@ export default function Navbar() {
         <a
           href="mailto:shahprem2412@gmail.com"
           className="btn btn-primary"
-          style={{ marginTop: "0.5rem" }}
+          style={{ marginTop: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}
+          onClick={closeMobile}
         >
-          ✉ Get In Touch
+          <MailIcon /> Get In Touch
         </a>
       </div>
     </>
