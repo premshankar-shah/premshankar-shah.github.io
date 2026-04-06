@@ -1,0 +1,266 @@
+"use client";
+import { useEffect } from "react";
+
+function useReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll<HTMLElement>(".reveal");
+    const obs = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).classList.add("visible");
+            obs.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.1 }
+    );
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+}
+
+const principles = [
+  {
+    number: "01",
+    icon: "🫀",
+    iconBg: "rgba(108,99,255,0.15)",
+    iconColor: "var(--accent-secondary)",
+    title: "Operational Empathy",
+    subtitle: "Design for the person at 2am",
+    accentColor: "var(--accent-secondary)",
+    body: `The person who maintains your system is not the person who wrote it. They're a future engineer who wasn't in the planning meetings, doesn't have all the context, and is probably working under pressure. Every architectural decision I make, I ask: what happens when this breaks at 2am and someone who didn't write it has to fix it?
+
+This principle shapes how I name things, how I log errors, how I write migration scripts, and how I document edge cases. Good software isn't just software that runs — it's software that fails gracefully and communicates clearly when it does.`,
+    example: `At Searce, when building the EPOS sync engine, I built a "sync audit log" that wasn't in the original spec. It colored sync failures by severity, showed which records were affected, and gave actionable next steps. The operations team never needed to ping engineering for a "what happened?" diagnosis.`,
+    exampleLabel: "In Practice",
+  },
+  {
+    number: "02",
+    icon: "🧭",
+    iconBg: "rgba(56,189,248,0.12)",
+    iconColor: "var(--accent-tertiary)",
+    title: "Navigating Ambiguity",
+    subtitle: "From napkin sketch to production",
+    accentColor: "var(--accent-tertiary)",
+    body: `The most dangerous statement in software is "we'll figure that out later." Senior engineering isn't just about writing good code — it's about converting vague requirements into concrete decisions, early enough that they don't become expensive problems.
+
+When a stakeholder says "it needs to work offline," I hear four questions: offline for how long? What data needs to sync? Who resolves conflicts? What does the UX look like when sync is failing? I'm the person in the room who asks those questions before anyone writes a line of code.`,
+    example: `The EPOS project kicked off with a Figma mockup and a Notion doc. By the time the first sprint ended, I had mapped every offline state, every sync conflict scenario, and every failure mode — documented as ADRs (Architecture Decision Records) that became the team's reference for the next 4 months.`,
+    exampleLabel: "In Practice",
+  },
+  {
+    number: "03",
+    icon: "⏳",
+    iconBg: "rgba(52,211,153,0.12)",
+    iconColor: "var(--accent-green)",
+    title: "Long-Horizon Thinking",
+    subtitle: "The 18-month lens on every decision",
+    accentColor: "var(--accent-green)",
+    body: `Short-term speed and long-term maintainability are often in tension. My job is to find the line where they meet. I consistently choose decisions that feel slightly slower now but eliminate entire categories of future pain.
+
+This doesn't mean over-engineering. It means building the right abstractions, writing the tests that will save the next engineer, and choosing dependencies with an eye on their longevity, community health, and upgrade paths — not just their GitHub stars.`,
+    example: `At MindInventory, I championed migrating from the default React Navigation setup to a typed route configuration before it was "urgent." Six months later, when the app scaled to 40+ screens, the team navigated (pun intended) without a single routing regression.`,
+    exampleLabel: "In Practice",
+  },
+];
+
+const failureStory = {
+  title: "The Launch That Taught Me About Communication Contracts",
+  context: `During a major app release at MindInventory, we shipped a state management refactor alongside a feature update in the same release. The refactor worked perfectly in our test environment — but caused a cascade of edge-case failures in production for a specific combination of low-memory Android devices. We rolled back within 2 hours. Zero permanent damage. But two hours of production downtime is two hours too many.`,
+  whatWentWrong: `The root cause wasn't technical — it was a communication gap. The refactor and the feature were owned by different engineers, reviewed independently, and the integration risk was never explicitly discussed in planning. We had two individually-correct pieces that composed incorrectly.`,
+  guardrails: [
+    {
+      icon: "📋",
+      text: "Introduced a mandatory \"integration risk section\" in every PR description — a one-paragraph answer to: \"What does this change assume about other parts of the system that are also changing this sprint?\"",
+    },
+    {
+      icon: "🧪",
+      text: "Added low-memory and mid-range Android device profiles to the CI test matrix. Edge-case hardware is where integration bugs live.",
+    },
+    {
+      icon: "🚦",
+      text: "Established a \"change coupling\" rule: if two PRs touch overlapping state, they ship together or not at all. Decoupled reviews, coupled deployments.",
+    },
+    {
+      icon: "📚",
+      text: "Wrote a post-mortem that focused entirely on process, not blame. It became the team's template for all future incident retrospectives.",
+    },
+  ],
+  lesson: `Every system failure is a communication failure wearing a technical costume. The best guardrails aren't in the code — they're in how the team talks about change.`,
+};
+
+export default function MindsetPage() {
+  useReveal();
+
+  return (
+    <>
+      {/* Page Header */}
+      <section
+        style={{
+          paddingTop: "calc(var(--nav-height) + 5rem)",
+          paddingBottom: "3rem",
+          background: "var(--gradient-hero)",
+        }}
+      >
+        <div className="container">
+          <div className="reveal">
+            <div className="section-eyebrow">Engineering Philosophy</div>
+            <h1 className="section-title" style={{ maxWidth: "700px" }}>
+              How I think, <span className="text-gradient">not just what I build.</span>
+            </h1>
+            <p className="section-desc">
+              Three principles that shape every architectural decision, code review,
+              and stakeholder conversation I have.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Principles */}
+      <section className="section" style={{ paddingTop: "2rem" }}>
+        <div className="container">
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+              gap: "1.5rem",
+              marginBottom: "5rem",
+            }}
+          >
+            {principles.map((p, i) => (
+              <div className="principle-card reveal" key={i}>
+                <div className="principle-number" style={{ color: p.accentColor }}>
+                  {p.number}
+                </div>
+                <div
+                  className="principle-icon-wrap"
+                  style={{ background: p.iconBg, color: p.iconColor, fontSize: "1.5rem" }}
+                >
+                  {p.icon}
+                </div>
+                <h2 className="principle-title">{p.title}</h2>
+                <div
+                  className="principle-subtitle"
+                  style={{ color: p.accentColor }}
+                >
+                  {p.subtitle}
+                </div>
+                <div className="principle-body">
+                  {p.body.split("\n\n").map((para, j) => (
+                    <p
+                      key={j}
+                      style={{ marginBottom: j < p.body.split("\n\n").length - 1 ? "1em" : 0 }}
+                    >
+                      {para}
+                    </p>
+                  ))}
+                </div>
+                <div className="principle-example">
+                  <strong>{p.exampleLabel}: </strong>
+                  {p.example}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Failure Story */}
+          <div className="reveal">
+            <div className="section-header" style={{ marginBottom: "2rem" }}>
+              <div className="section-eyebrow">Hard-Won Lessons</div>
+              <h2 className="section-title">
+                A failure story I&apos;m{" "}
+                <span className="text-gradient">glad I experienced.</span>
+              </h2>
+              <p className="section-desc">
+                The best engineers aren&apos;t the ones who never fail. They&apos;re the
+                ones who build systems to prevent the same failure twice.
+              </p>
+            </div>
+
+            <div className="failure-card">
+              <div className="failure-header">
+                <div className="failure-header-icon">💥</div>
+                <div>
+                  <div className="failure-header-label">Failure Story</div>
+                  <div className="failure-header-title">{failureStory.title}</div>
+                </div>
+              </div>
+
+              <div className="failure-body">
+                <div className="failure-section">
+                  <div
+                    className="failure-section-label"
+                    style={{ color: "var(--accent-tertiary)" }}
+                  >
+                    The Context
+                  </div>
+                  <p className="failure-section-text">{failureStory.context}</p>
+                </div>
+
+                <div className="failure-section">
+                  <div
+                    className="failure-section-label"
+                    style={{ color: "var(--accent-rose)" }}
+                  >
+                    What Went Wrong
+                  </div>
+                  <p className="failure-section-text">{failureStory.whatWentWrong}</p>
+                </div>
+
+                <div className="failure-section">
+                  <div
+                    className="failure-section-label"
+                    style={{ color: "var(--accent-green)" }}
+                  >
+                    Guardrails We Built
+                  </div>
+                  <div className="guardrails">
+                    {failureStory.guardrails.map((g, i) => (
+                      <div className="guardrail-item" key={i}>
+                        <span className="guardrail-icon">{g.icon}</span>
+                        <span>{g.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: "1.75rem",
+                    padding: "1.25rem 1.5rem",
+                    background: "rgba(108,99,255,0.06)",
+                    border: "1px solid rgba(108,99,255,0.15)",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "var(--accent-secondary)",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    The Takeaway
+                  </div>
+                  <p
+                    style={{
+                      fontSize: "0.95rem",
+                      color: "var(--text-primary)",
+                      lineHeight: 1.7,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    &ldquo;{failureStory.lesson}&rdquo;
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

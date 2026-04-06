@@ -1,0 +1,58 @@
+name: Deploy Portfolio to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main        # deploy on every push to main
+  workflow_dispatch: # also allow manual trigger from GitHub UI
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to push to gh-pages branch
+
+    steps:
+      # ── 1. Checkout ───────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Setup Node ─────────────────────────────────────────────────────
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      # ── 3. Install dependencies ───────────────────────────────────────────
+      - name: Install dependencies
+        run: npm ci
+
+      # ── 4. Build static export ────────────────────────────────────────────
+      # REPO_NAME controls basePath.
+      # • Root domain (premshankar-shah.github.io)  → REPO_NAME=""  (default)
+      # • Sub-path (premshankar-shah.github.io/foo) → REPO_NAME="foo"
+      - name: Build static site
+        run: npm run build
+        env:
+          NODE_ENV: production
+          REPO_NAME: ${{ vars.REPO_NAME }}   # set this in GitHub → Settings → Variables
+
+      # ── 5. Add .nojekyll (required for Next.js static assets) ─────────────
+      - name: Add .nojekyll file
+        run: touch out/.nojekyll
+
+      # ── 6. Deploy to gh-pages branch ──────────────────────────────────────
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          publish_branch: gh-pages
+          force_orphan: true          # keep gh-pages branch clean (single commit)
+          commit_message: "deploy: ${{ github.sha }}"
