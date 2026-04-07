@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# &lt;Prem /&gt; — Senior React Native Developer Portfolio
 
-## Getting Started
+[![Deployed to GitHub Pages](https://github.com/premshankar-shah/premshankar-shah.github.io/actions/workflows/deploy.yml/badge.svg)](https://premshankar-shah.github.io/)
 
-First, run the development server:
+> **Experience-first React Native developer portfolio. Showcasing enterprise mobile architecture, offline-first systems, and complex hardware integrations.**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🌐 **Live Site:** [https://premshankar-shah.github.io/](https://premshankar-shah.github.io/)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This repository contains the source code for my professional portfolio. Instead of a traditional "grid of projects", this site is designed as an "experience-first" deep dive into how I work, the technical decisions I make, and the business impact of the systems I build.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠 Tech Stack
 
-## Learn More
+Designed for high performance, maintainability, and clean aesthetics:
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework:** [Next.js](https://nextjs.org/) (App Router)
+- **Language:** TypeScript
+- **Styling:** Vanilla CSS Modules with rich CSS variables (for true control over micro-animations and performance without massive utility classes).
+- **Hosting:** GitHub Pages (Static HTML Export)
+- **CI/CD:** GitHub Actions Automation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Running Locally
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To run this project on your local machine:
 
-## Deploy on Vercel
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/premshankar-shah/premshankar-shah.github.io.git
+   cd premshankar-shah.github.io/portfolio-web
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **View the app:**
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📫 Let's Connect
+
+I'm currently looking for senior roles where I can own architecture, lead a team, and ship apps that matter.
+
+- **Email:** [shahprem2412@gmail.com](mailto:shahprem2412@gmail.com)
+- **LinkedIn:** [in/premshankar-shah](https://www.linkedin.com/in/premshankar-shah/)
+- **GitHub:** [@premshankar-shah](https://github.com/premshankar-shah)
+
+---
+*Built from scratch with ❤️ and code.*
