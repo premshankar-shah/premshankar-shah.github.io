@@ -514,27 +514,6 @@ img { max-width: 100%; }
   cursor: grabbing;
 }
 
-.marquee-track::before,
-.marquee-track::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 120px;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.marquee-track::before {
-  left: 0;
-  background: linear-gradient(90deg, var(--bg-secondary), transparent);
-}
-
-.marquee-track::after {
-  right: 0;
-  background: linear-gradient(-90deg, var(--bg-secondary), transparent);
-}
-
 .marquee-inner {
   display: flex;
   gap: 1.5rem;

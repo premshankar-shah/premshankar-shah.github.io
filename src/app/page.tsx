@@ -4,7 +4,16 @@ import Link from "next/link";
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────
 const MailIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <rect x="2" y="4" width="20" height="16" rx="2" />
     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
   </svg>
@@ -129,8 +138,22 @@ const featuredProjects = [
       { value: "99.9%", label: "Reliability" },
       { value: "60%", label: "Txn Success ↑" },
     ],
-    tags: ["React Native", "Node.js", "Adyen", "WatermelonDB", "Kotlin", "Swift"],
-    tagColors: ["tag-purple", "tag-blue", "tag-orange", "tag-green", "tag-rose", "tag-blue"],
+    tags: [
+      "React Native",
+      "Node.js",
+      "Adyen",
+      "WatermelonDB",
+      "Kotlin",
+      "Swift",
+    ],
+    tagColors: [
+      "tag-purple",
+      "tag-blue",
+      "tag-orange",
+      "tag-green",
+      "tag-rose",
+      "tag-blue",
+    ],
     href: "/work/epos-platform",
   },
   {
@@ -143,7 +166,13 @@ const featuredProjects = [
       { value: "Real-time", label: "IoT Control" },
     ],
     tags: ["Expo", "React Native Web", "IoT", "IAP", "WebSockets"],
-    tagColors: ["tag-blue", "tag-blue", "tag-green", "tag-orange", "tag-purple"],
+    tagColors: [
+      "tag-blue",
+      "tag-blue",
+      "tag-green",
+      "tag-orange",
+      "tag-purple",
+    ],
     href: "/work/arcade-live",
   },
   {
@@ -156,7 +185,13 @@ const featuredProjects = [
       { value: "Dual", label: "Payment Rails" },
     ],
     tags: ["React Native", "Redux Toolkit", "Stripe", "IAP", "Mapbox"],
-    tagColors: ["tag-purple", "tag-orange", "tag-orange", "tag-green", "tag-blue"],
+    tagColors: [
+      "tag-purple",
+      "tag-orange",
+      "tag-orange",
+      "tag-green",
+      "tag-blue",
+    ],
     href: "/work/secret-world",
   },
 ];
@@ -173,7 +208,7 @@ function useReveal() {
             obs.unobserve(e.target);
           }
         }),
-      { threshold: 0.12 }
+      { threshold: 0.12 },
     );
     els.forEach((el) => obs.observe(el));
     return () => obs.disconnect();
@@ -183,17 +218,17 @@ function useReveal() {
 // ── Draggable Marquee Component ────────────────────────────────────────────
 function DraggableMarquee() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const groupRef = useRef<HTMLDivElement>(null);
   const isHovered = useRef(false);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const startScrollLeft = useRef(0);
   const posRef = useRef(0);
 
-  const pillarsDoubled = [...pillars, ...pillars];
-
   useEffect(() => {
     const track = trackRef.current;
-    if (!track) return;
+    const group = groupRef.current;
+    if (!track || !group) return;
 
     let rafId: number;
     const speed = 0.6; // px per frame
@@ -201,9 +236,11 @@ function DraggableMarquee() {
     const animate = () => {
       if (!isHovered.current && !isDragging.current) {
         posRef.current += speed;
-        // Reset halfway through (content is doubled)
-        if (posRef.current >= track.scrollWidth / 2) {
-          posRef.current = 0;
+        // Reset seamlessly when the first group + gap (24px for 1.5rem) has safely scrolled past
+        // We use offsetWidth to reliably get the exact rendered width of the group.
+        const groupWidth = group.offsetWidth;
+        if (posRef.current >= groupWidth + 24) {
+          posRef.current -= (groupWidth + 24); 
         }
         track.scrollLeft = posRef.current;
       } else {
@@ -243,28 +280,51 @@ function DraggableMarquee() {
 
   return (
     <section className="marquee-section" id="expertise">
-      <p className="marquee-label">Expertise Pillars · Drag or hover to pause</p>
+      <p className="marquee-label">
+        Expertise Pillars · Drag or hover to pause
+      </p>
 
       <div
         className="marquee-track"
         ref={trackRef}
         onMouseEnter={() => { isHovered.current = true; }}
-        onMouseLeave={() => { isHovered.current = false; isDragging.current = false; if (trackRef.current) trackRef.current.style.cursor = "grab"; }}
+        onMouseLeave={() => {
+          isHovered.current = false;
+          isDragging.current = false;
+          if (trackRef.current) trackRef.current.style.cursor = "grab";
+        }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
-        <div className="marquee-inner">
-          {pillarsDoubled.map((p, i) => (
-            <div className="pillar-card" key={i} style={{ userSelect: "none" }}>
-              <div className="pillar-icon" style={{ background: p.iconBg, color: p.color }}>
-                {p.icon}
+        <div className="marquee-inner" style={{ padding: "1.25rem 1.5rem" }}>
+          {/* Group 1 */}
+          <div className="marquee-group" ref={groupRef} style={{ display: "flex", gap: "1.5rem" }}>
+            {pillars.map((p, i) => (
+              <div className="pillar-card" key={`g1-${i}`} style={{ userSelect: "none" }}>
+                <div className="pillar-icon" style={{ background: p.iconBg, color: p.color }}>
+                  {p.icon}
+                </div>
+                <div className="pillar-title">{p.title}</div>
+                <div className="pillar-body">{p.body}</div>
+                <div className="pillar-metric">{p.metric}</div>
               </div>
-              <div className="pillar-title">{p.title}</div>
-              <div className="pillar-body">{p.body}</div>
-              <div className="pillar-metric">{p.metric}</div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Group 2 */}
+          <div className="marquee-group" aria-hidden="true" style={{ display: "flex", gap: "1.5rem" }}>
+            {pillars.map((p, i) => (
+              <div className="pillar-card" key={`g2-${i}`} style={{ userSelect: "none" }}>
+                <div className="pillar-icon" style={{ background: p.iconBg, color: p.color }}>
+                  {p.icon}
+                </div>
+                <div className="pillar-title">{p.title}</div>
+                <div className="pillar-body">{p.body}</div>
+                <div className="pillar-metric">{p.metric}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -276,18 +336,35 @@ function TechStackSection() {
   return (
     <section className="section" style={{ paddingTop: 0 }} id="tech-stack">
       <div className="container">
-        <div className="glass-card reveal" style={{ padding: "2.5rem 2.5rem 2rem", borderRadius: "20px" }}>
+        <div
+          className="glass-card reveal"
+          style={{ padding: "2.5rem 2.5rem 2rem", borderRadius: "20px" }}
+        >
           {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "2rem",
+              flexWrap: "wrap",
+              gap: "1rem",
+            }}
+          >
             <div>
-              <p className="section-eyebrow" style={{ marginBottom: "0.4rem" }}>Technical Skills</p>
+              <p className="section-eyebrow" style={{ marginBottom: "0.4rem" }}>
+                Technical Skills
+              </p>
               <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
                 Tools & technologies I use in production
               </p>
             </div>
             <span
               className="tag tag-green"
-              style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "0.72rem" }}
+              style={{
+                fontFamily: "JetBrains Mono, monospace",
+                fontSize: "0.72rem",
+              }}
             >
               ● 5+ yrs production
             </span>
@@ -326,9 +403,15 @@ function TechStackSection() {
                   </span>
                 </div>
                 {/* Tech pills */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
+                <div
+                  style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}
+                >
                   {cat.items.map((item) => (
-                    <span key={item} className={`tag ${cat.accentClass}`} style={{ fontSize: "0.78rem" }}>
+                    <span
+                      key={item}
+                      className={`tag ${cat.accentClass}`}
+                      style={{ fontSize: "0.78rem" }}
+                    >
                       {item}
                     </span>
                   ))}
@@ -370,16 +453,21 @@ export default function HomePage() {
             </h1>
 
             <p className="hero-subtitle animate-fade-up delay-200">
-              Senior React Native Developer with 5+ years turning ambiguous requirements
-              into production systems. I specialize in enterprise architecture, offline-first
-              design, and the kind of payment integrations that can&apos;t fail.
+              Senior React Native Developer with 5+ years turning ambiguous
+              requirements into production systems. I specialize in enterprise
+              architecture, offline-first design, and the kind of payment
+              integrations that can&apos;t fail.
             </p>
 
             <div className="hero-actions animate-fade-up delay-300">
               <Link href="/work" className="btn btn-primary" id="hero-cta-work">
                 <span>→</span> View My Work
               </Link>
-              <Link href="/timeline" className="btn btn-ghost" id="hero-cta-timeline">
+              <Link
+                href="/timeline"
+                className="btn btn-ghost"
+                id="hero-cta-timeline"
+              >
                 My Journey
               </Link>
               <a
@@ -423,32 +511,52 @@ export default function HomePage() {
           <div className="section-header reveal">
             <div className="section-eyebrow">Selected Work</div>
             <h2 className="section-title">
-              Projects with <span className="text-gradient">business impact</span>
+              Projects with{" "}
+              <span className="text-gradient">business impact</span>
             </h2>
             <p className="section-desc">
-              Not just apps that run — platforms that generated revenue, reduced operational
-              costs, and scaled with their users.
+              Not just apps that run — platforms that generated revenue, reduced
+              operational costs, and scaled with their users.
             </p>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+          >
             {featuredProjects.map((p, i) => (
               <Link key={i} href={p.href} style={{ textDecoration: "none" }}>
-                <div className="project-card reveal glass-card" style={{ borderRadius: "20px" }}>
+                <div
+                  className="project-card reveal glass-card"
+                  style={{ borderRadius: "20px" }}
+                >
                   <div className="project-header">
                     <div className="project-meta">
-                      <span className="tag tag-purple" style={{ fontFamily: "JetBrains Mono, monospace" }}>
+                      <span
+                        className="tag tag-purple"
+                        style={{ fontFamily: "JetBrains Mono, monospace" }}
+                      >
                         Case Study 0{i + 1}
                       </span>
-                      <span className="read-more" style={{ marginLeft: "auto" }}>
+                      <span
+                        className="read-more"
+                        style={{ marginLeft: "auto" }}
+                      >
                         Read case study →
                       </span>
                     </div>
                     <h3 className="project-title">{p.title}</h3>
                     <p className="project-summary">{p.summary}</p>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: "0.5rem",
+                      }}
+                    >
                       {p.tags.map((t, j) => (
-                        <span key={j} className={`tag ${p.tagColors[j]}`}>{t}</span>
+                        <span key={j} className={`tag ${p.tagColors[j]}`}>
+                          {t}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -465,7 +573,14 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div style={{ marginTop: "3rem", display: "flex", justifyContent: "center" }} className="reveal">
+          <div
+            style={{
+              marginTop: "3rem",
+              display: "flex",
+              justifyContent: "center",
+            }}
+            className="reveal"
+          >
             <Link href="/work" className="btn btn-ghost" id="view-all-work">
               View All Projects →
             </Link>
@@ -489,11 +604,16 @@ export default function HomePage() {
               <span className="text-gradient">next big thing?</span>
             </h2>
             <p className="cta-desc">
-              I&apos;m currently open to senior roles where I can own architecture,
-              lead a team, and ship apps that matter. 60-day notice period.
+              I&apos;m currently open to senior roles where I can own
+              architecture, lead a team, and ship apps that matter. 60-day
+              notice period.
             </p>
             <div className="cta-links">
-              <a href="mailto:shahprem2412@gmail.com" className="btn btn-primary" id="cta-email">
+              <a
+                href="mailto:shahprem2412@gmail.com"
+                className="btn btn-primary"
+                id="cta-email"
+              >
                 <MailIcon /> shahprem2412@gmail.com
               </a>
               <a
@@ -514,7 +634,11 @@ export default function HomePage() {
               >
                 ⌥ GitHub
               </a>
-              <a href="tel:+919824594969" className="social-chip" id="cta-phone">
+              <a
+                href="tel:+919824594969"
+                className="social-chip"
+                id="cta-phone"
+              >
                 ☎ +91 98245 94969
               </a>
             </div>
